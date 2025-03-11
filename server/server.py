@@ -1,13 +1,27 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import os
 import sys
 import json
+import tempfile
 from docx import Document
 import time
 
 app = Flask(__name__)
 CORS(app)  # Allow cross-origin requests
+
+# Get port from environment variable (for cloud deployment)
+PORT = int(os.environ.get('PORT', 5000))
+
+# Handle paths for cloud environment
+def get_temp_dir():
+    """Get appropriate temp directory based on environment"""
+    if 'RENDER' in os.environ:
+        # Use Render's temp directory
+        return '/tmp'
+    else:
+        # Use system default temp directory
+        return tempfile.gettempdir()
 
 @app.route('/status', methods=['GET'])
 def status():
@@ -15,6 +29,7 @@ def status():
     return jsonify({
         'status': 'ready',
         'version': '1.0.0',
+        'environment': os.environ.get('RENDER', 'development'),
         'features': ['word_generation', 'pdf_preview']
     })
 
@@ -28,19 +43,22 @@ def generate_document():
             
         template = data.get('template')
         form_data = data.get('data')
-        output_path = data.get('outputPath')
         
-        if not all([template, form_data, output_path]):
+        if not all([template, form_data]):
             return jsonify({'error': 'Missing required parameters'}), 400
             
-        # Ensure the output directory exists
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        
+        # Generate a temporary file path
+        temp_dir = get_temp_dir()
+        output_path = os.path.join(temp_dir, f"doc_{int(time.time())}.docx")
+            
         # Generate the document
         success = create_word_document(template, form_data, output_path)
         
         if success:
-            return jsonify({'success': True, 'path': output_path})
+            # Return the file for download
+            return send_file(output_path, as_attachment=True, 
+                            attachment_filename=f"{template['name'].replace(' ', '_')}.docx", 
+                            mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
         else:
             return jsonify({'error': 'Failed to generate document'}), 500
             
@@ -248,5 +266,6 @@ def convert_word_to_pdf(input_docx, output_pdf):
         return False
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(debug=True, host='0.0.0.0', port=port)
+    debug_mode = os.environ.get('DEBUG', 'False').lower() == 'true'
+    host = '0.0.0.0'  # Bind to all interfaces
+    app.run(debug=debug_mode, host=host, port=PORT)

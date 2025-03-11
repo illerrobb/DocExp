@@ -2,11 +2,24 @@ export class DocumentManager {
     constructor() {
         // Initialize the Python service for document generation
         this.pythonService = {
-            url: 'http://localhost:5000', // Default to local Flask server
+            url: this.getPythonServiceUrl(),
             initialized: false
         };
         
         this.initializePythonService();
+    }
+    
+    // Get Python service URL based on environment
+    getPythonServiceUrl() {
+        // Check if we're running on render.com or similar cloud environment
+        if (window.location.hostname.includes('render.com') || 
+            window.location.hostname.includes('onrender.com')) {
+            // Use the same origin for API calls in production
+            return window.location.origin + '/api';
+        } else {
+            // Use localhost for development
+            return 'http://localhost:5000';
+        }
     }
     
     async initializePythonService() {
@@ -32,6 +45,11 @@ export class DocumentManager {
     
     async exportDocument(template, formData, outputPath) {
         try {
+            // In cloud environment, use different approach for file handling
+            if (this.isCloudEnvironment()) {
+                return await this.exportDocumentInCloud(template, formData);
+            }
+            
             // First check if we can use the Python service
             if (this.pythonService.initialized) {
                 return await this.exportDocumentViaPython(template, formData, outputPath);
@@ -41,6 +59,39 @@ export class DocumentManager {
             }
         } catch (error) {
             console.error('Error exporting document:', error);
+            throw error;
+        }
+    }
+    
+    isCloudEnvironment() {
+        return window.location.hostname.includes('render.com') || 
+               window.location.hostname.includes('onrender.com');
+    }
+    
+    async exportDocumentInCloud(template, formData) {
+        try {
+            // Generate document content
+            const docContent = this.templateType === 'json' ? 
+                this.generateJsonWordContent(template, formData) : 
+                this.generateWordDocContent(template, formData);
+            
+            // Create a blob and trigger download
+            const blob = new Blob([docContent], 
+                { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            const url = URL.createObjectURL(blob);
+            
+            // Create a download link
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${template.name.replace(/\s+/g, '_')}_${Date.now()}.docx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            return true;
+        } catch (error) {
+            console.error('Cloud document generation failed:', error);
             throw error;
         }
     }
