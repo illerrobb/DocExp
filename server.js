@@ -17,10 +17,14 @@ const clientEnv = {
 app.use(cors());
 app.use(express.json());
 
+// Debug logging for requests
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
 // Serve static files with proper caching
-app.use(express.static(path.join(__dirname), {
-  maxAge: '1h', // Cache static assets for 1 hour
-}));
+app.use(express.static(path.join(__dirname)));
 
 // Serve environment variables to client
 app.get('/env.js', (req, res) => {
@@ -29,46 +33,38 @@ app.get('/env.js', (req, res) => {
   res.send(`window.process = { env: ${JSON.stringify(clientEnv)} };`);
 });
 
-// Health check with detailed info
+// Health check
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
     environment: process.env.NODE_ENV,
     pythonServiceUrl: process.env.PYTHON_SERVICE_URL || 'not configured',
     hostname: req.hostname,
-    url: req.url,
     serverTime: new Date().toISOString()
   });
 });
 
-// Fix - Add safety check to prevent redirect loops
-app.use((req, res, next) => {
-  // Check if this request might cause a redirect loop
-  const loopHeader = req.get('X-Docgen-Loop-Prevention');
-  if (loopHeader) {
-    return res.status(508).send('Loop detected. Request aborted to prevent infinite redirects.');
-  }
-  next();
-});
-
 // API routes
-app.get('/api/startPythonServer', (req, res) => {
-  try {
-    exec('cd server && python server.py', (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Python server error: ${error}`);
-        return res.status(500).json({ error: 'Failed to start Python server' });
-      }
-      console.log(`Python server output: ${stdout}`);
-      res.json({ success: true, message: 'Python server started' });
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 app.get('/api/pythonStatus', async (req, res) => {
   try {
+    const pythonUrl = process.env.PYTHON_SERVICE_URL || 'http://localhost:5000';
+    
+    try {
+      const response = await fetch(`${pythonUrl}/status`);
+      if (response.ok) {
+        const data = await response.json();
+        return res.json({ available: true, status: data });
+      } else {
+        return res.json({ available: false, error: `Status code: ${response.status}` });
+      }
+    } catch (error) {
+      return res.json({ 
+        available: false, 
+        error: error.message,
+        hint: 'Python service may not be running'
+      });
+    }
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
@@ -82,7 +78,7 @@ app.get('*', (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Node.js frontend server running at http://localhost:${PORT}`);
   console.log('Environment:', process.env.NODE_ENV);
   console.log('Python service URL:', process.env.PYTHON_SERVICE_URL || 'not configured');
 });

@@ -28,12 +28,13 @@ def get_temp_dir():
 
 @app.route('/', methods=['GET'])
 def home():
-    """Return API info instead of redirecting to prevent loops"""
+    """Return API info and direct users to the frontend app"""
     return jsonify({
         "api": "DocGen API",
         "status": "active",
         "version": "1.0.0",
-        "message": "This is the API endpoint. For the web application, go to https://docexp.onrender.com"
+        "message": "This is the API endpoint. For the web application, go to https://docexp.onrender.com",
+        "frontend_url": "https://docexp.onrender.com"
     })
 
 @app.route('/status', methods=['GET'])
