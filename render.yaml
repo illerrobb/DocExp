@@ -1,21 +1,5 @@
 services:
-  # Frontend Node.js - This is the main website that users should visit
-  - type: web
-    name: docexp
-    env: node
-    buildCommand: npm install
-    startCommand: node server.js
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: FRONTEND_URL
-        value: https://docexp.onrender.com
-      - key: PYTHON_SERVICE_URL
-        value: https://docexp-api.onrender.com
-    healthCheckPath: /health
-    autoDeploy: true
-
-  # Backend Python (Flask API) - This handles document processing only
+  # Python API Backend - This handles document processing only
   - type: web
     name: docexp-api
     env: python
@@ -30,8 +14,28 @@ services:
       - key: DEBUG
         value: "false"
       - key: FRONTEND_URL
-        value: https://docexp.onrender.com
+        value: https://docexp.onreader.com
       - key: API_URL
         value: https://docexp-api.onrender.com
     healthCheckPath: /status
     autoDeploy: true
+    domains:
+      - docexp-api.onrender.com
+
+  # Main Frontend - This is where users will access the application
+  - type: web
+    name: docexp
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://docexp.onreader.com
+      - key: PYTHON_SERVICE_URL
+        value: https://docexp-api.onrender.com
+    healthCheckPath: /health
+    autoDeploy: true
+    domains:
+      - docexp.onreader.com

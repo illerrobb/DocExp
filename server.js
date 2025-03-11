@@ -76,16 +76,23 @@ app.get('/api/pythonStatus', async (req, res) => {
   }
 });
 
-// Serve index.html for all other routes to support SPA routing
+// Handle root route explicitly
+app.get('/', (req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Serve index.html for all other non-API routes to support SPA routing
 app.get('*', (req, res, next) => {
   // Skip API routes
   if (req.path.startsWith('/api/')) {
     return next();
   }
-  // Set no-cache headers for index.html
+  // Skip health check
+  if (req.path === '/health') {
+    return next();
+  }
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.set('Pragma', 'no-cache');
-  res.set('Expires', '0');
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
