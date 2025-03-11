@@ -1,5 +1,5 @@
 services:
-  # Main web service
+  # Main web service - Run Node.js app that serves the frontend
   - type: web
     name: docgen-web
     env: node
@@ -8,13 +8,22 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PYTHON_SERVICE_URL
+        fromService:
+          name: docgen-api
+          type: web
+          property: url
 
-  # Python API service
+  # Python API service - Handle document generation
   - type: web
     name: docgen-api
     env: python
     buildCommand: pip install -r server/requirements.txt
-    startCommand: cd server && gunicorn server:app
+    startCommand: cd server && gunicorn --bind 0.0.0.0:$PORT server:app
     envVars:
       - key: RENDER
-        value: true
+        value: "true"
+      - key: PYTHONPATH
+        value: ./server
+      - key: DEBUG
+        value: "false"

@@ -14,8 +14,14 @@ export class DocumentManager {
         // Check if we're running on render.com or similar cloud environment
         if (window.location.hostname.includes('render.com') || 
             window.location.hostname.includes('onrender.com')) {
-            // Use the same origin for API calls in production
-            return window.location.origin + '/api';
+            
+            // Check if we have an environment variable with the Python service URL
+            if (process.env.PYTHON_SERVICE_URL) {
+                return process.env.PYTHON_SERVICE_URL;
+            }
+            
+            // Default API path for render
+            return window.location.origin.replace('docgen-web', 'docgen-api');
         } else {
             // Use localhost for development
             return 'http://localhost:5000';
@@ -24,23 +30,33 @@ export class DocumentManager {
     
     async initializePythonService() {
         try {
-            const response = await fetch(`${this.pythonService.url}/status`);
+            console.log(`Attempting to connect to Python service at: ${this.pythonService.url}`);
+            const response = await fetch(`${this.pythonService.url}/status`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                timeout: 5000 // 5 second timeout
+            });
+            
             if (response.ok) {
                 const data = await response.json();
                 if (data.status === 'ready') {
                     this.pythonService.initialized = true;
-                    console.log("Python document service is ready");
+                    console.log("Python document service is ready:", data);
                     return true;
+                } else {
+                    console.warn("Python service status not ready:", data);
                 }
+            } else {
+                console.warn(`Python service responded with status: ${response.status}`);
             }
-            
-            console.warn("Python document service not available. Using fallback method.");
-            return false;
         } catch (error) {
             console.error("Failed to connect to Python service:", error);
-            console.warn("Using fallback document generation method.");
-            return false;
         }
+        
+        console.warn("Using fallback document generation method.");
+        return false;
     }
     
     async exportDocument(template, formData, outputPath) {
@@ -52,7 +68,12 @@ export class DocumentManager {
             
             // First check if we can use the Python service
             if (this.pythonService.initialized) {
-                return await this.exportDocumentViaPython(template, formData, outputPath);
+                try {
+                    return await this.exportDocumentViaPython(template, formData, outputPath);
+                } catch (error) {
+                    console.error('Python service export failed, falling back to client-side:', error);
+                    return await this.exportDocumentClientSide(template, formData, outputPath);
+                }
             } else {
                 // Fallback to client-side generation
                 return await this.exportDocumentClientSide(template, formData, outputPath);
