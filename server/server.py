@@ -29,7 +29,7 @@ def get_temp_dir():
 @app.route('/', methods=['GET'])
 def home():
     """Return a basic API welcome message so that clients accessing the API host get a simple response."""
-    frontend_url = os.environ.get('FRONTEND_URL', 'https://docexp.onreader.com')
+    frontend_url = os.environ.get('FRONTEND_URL', 'https://docexp.onrender.com')
     return redirect(frontend_url)
 @app.route('/api-info', methods=['GET'])
 def api_info():
@@ -38,8 +38,8 @@ def api_info():
         "api": "DocGen API",
         "status": "active",
         "version": "1.0.0",
-        "message": "This is the API endpoint. For the web application, go to https://docexp.onreader.com",
-        "frontend_url": os.environ.get('FRONTEND_URL', 'https://docexp.onreader.com')
+        "message": "This is the API endpoint. For the web application, go to https://docexp.onrender.com",
+        "frontend_url": os.environ.get('FRONTEND_URL', 'https://docexp.onrender.com')
     })
 
 @app.route('/status', methods=['GET'])
