@@ -109,8 +109,8 @@ export class UIManager {
         templates.forEach(template => {
             const card = document.createElement('div');
             card.className = 'card';
-            card.dataset.id = template.id;
-            card.dataset.type = 'standard'; // Explicitly mark as standard template
+            card.dataset.id = String(template.id); // Ensure ID is a string in the dataset
+            card.dataset.type = 'standard';
             
             card.innerHTML = `
                 <h4>${template.name}</h4>

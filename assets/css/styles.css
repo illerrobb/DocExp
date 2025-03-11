@@ -406,3 +406,13 @@ input, textarea, select {
     font-size: 1.1rem;
     color: #666;
 }
+
+.debug-btn {
+    background-color: #e83e8c;
+    margin-left: 10px;
+    font-size: 0.85rem;
+}
+
+.debug-btn:hover {
+    background-color: #d4307a;
+}

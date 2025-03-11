@@ -314,16 +314,37 @@ export class DatabaseManager {
     
     async getTemplateById(id) {
         try {
+            console.log(`Looking for template with ID: ${id} (type: ${typeof id})`);
+            
+            // Convert ID to number if it's not already
+            const numericId = parseInt(id, 10);
+            if (isNaN(numericId)) {
+                console.error(`Invalid template ID: ${id}`);
+                return null;
+            }
+            
             const query = 'SELECT * FROM templates WHERE id = ?';
             const stmt = this.db.prepare(query);
-            stmt.bind([id]);
+            stmt.bind([numericId]);
             const result = stmt.getAsObject();
             stmt.free();
             
-            if (!result.id) return null;
+            console.log('Query result:', result);
+            
+            if (!result.id) {
+                console.error(`No template found with ID ${id}`);
+                return null;
+            }
             
             // Parse the fields
-            result.fields = JSON.parse(result.fields);
+            try {
+                result.fields = JSON.parse(result.fields);
+            } catch (parseError) {
+                console.error(`Error parsing fields for template ${id}:`, parseError);
+                result.fields = [];
+            }
+            
+            console.log(`Template found with ID ${id}:`, result);
             return result;
         } catch (error) {
             console.error(`Failed to get template with id ${id}:`, error);
@@ -440,16 +461,37 @@ export class DatabaseManager {
     
     async getJsonTemplateById(id) {
         try {
+            console.log(`Looking for JSON template with ID: ${id} (type: ${typeof id})`);
+            
+            // Convert ID to number if it's not already
+            const numericId = parseInt(id, 10);
+            if (isNaN(numericId)) {
+                console.error(`Invalid JSON template ID: ${id}`);
+                return null;
+            }
+            
             const query = 'SELECT * FROM json_templates WHERE id = ?';
             const stmt = this.db.prepare(query);
-            stmt.bind([id]);
+            stmt.bind([numericId]);
             const result = stmt.getAsObject();
             stmt.free();
             
-            if (!result.id) return null;
+            console.log('Query result:', result);
+            
+            if (!result.id) {
+                console.error(`No JSON template found with ID ${id}`);
+                return null;
+            }
             
             // Parse the schema
-            result.schema = JSON.parse(result.schema);
+            try {
+                result.schema = JSON.parse(result.schema);
+            } catch (parseError) {
+                console.error(`Error parsing schema for template ${id}:`, parseError);
+                result.schema = {};
+            }
+            
+            console.log(`JSON template found with ID ${id}:`, result);
             return result;
         } catch (error) {
             console.error(`Failed to get JSON template with id ${id}:`, error);

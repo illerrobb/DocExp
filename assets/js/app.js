@@ -69,7 +69,7 @@ class App {
         templates.forEach(template => {
             const card = document.createElement('div');
             card.className = 'card json-template';
-            card.dataset.id = template.id;
+            card.dataset.id = template.id;ate.id); // Ensure ID is a string in the dataset
             card.dataset.type = 'json';
             
             card.innerHTML = `
@@ -197,6 +197,15 @@ class App {
             e.preventDefault();
             this.savePackage();
         });
+
+        // Add debug button handler
+        const debugBtn = document.getElementById('debugTemplatesBtn');
+        if (debugBtn) {
+            debugBtn.addEventListener('click', async () => {
+                await this.debugTemplateIssue();
+                this.uiManager.showNotification('Check console for template debug info', 'info');
+            });
+        }
     }
     
     async onTemplateSelected(templateId) {
@@ -403,12 +412,46 @@ class App {
             document.querySelectorAll('#documentsForPackage .card.selected').forEach(card => {
                 card.classList.remove('selected');
             });
-            
+                // Add this helper method for template debugging
             this.loadDashboardData();
-            this.uiManager.showView('dashboard');
+            this.uiManager.showView('dashboard');');
         } catch (error) {
             console.error('Failed to save package:', error);
-            this.uiManager.showNotification('Errore nel salvataggio del pacchetto', 'error');
+            this.uiManager.showNotification('Errore nel salvataggio del pacchetto', 'error');t this.dbManager.getAllTemplates();
+        }
+    }.id,
+}
+         fieldsCount: t.fields?.length || 0
+// Initialize the application when the DOM is fully loaded         })));
+document.addEventListener('DOMContentLoaded', () => {            
+    console.log('DOM fully loaded');
+    window.app = new App();onTemplates.map(t => ({
+    window.app.init().then(() => {
+        console.log('App initialization completed');t.name,
+    }).catch(err => {
+        console.error('Error during app initialization:', err);
+    });
+});
+ const cards = document.querySelectorAll('#templateList .card');
+// Add a fallback for older browsers or if something goes wrong with DOMContentLoaded       console.log(`Found ${cards.length} template cards in the DOM:`);
+window.onload = function() {          
+    console.log('Window loaded');            Array.from(cards).forEach((card, i) => {
+
+
+
+
+
+
+
+
+
+};    }        });            console.error('Error during fallback app initialization:', err);        window.app.init().catch(err => {        window.app = new App();        console.log('App not initialized via DOMContentLoaded, initializing now');    if (!window.app) {                console.log(`Card ${i+1}: id=${card.dataset.id}, type=${card.dataset.type || 'standard'}`);
+            });
+            
+            return { dbTemplates: templates, dbJsonTemplates: jsonTemplates, domCards: Array.from(cards) };
+        } catch (error) {
+            console.error('Debug error:', error);
+            return null;
         }
     }
 }
@@ -420,7 +463,14 @@ document.addEventListener('DOMContentLoaded', () => {
     window.app.init().then(() => {
         console.log('App initialization completed');
     }).catch(err => {
-        console.error('Error during app initialization:', err);
+
+
+
+
+
+
+
+};    }        });            console.error('Error during fallback app initialization:', err);        window.app.init().catch(err => {        window.app = new App();        console.error('Error during app initialization:', err);
     });
 });
 
@@ -429,9 +479,3 @@ window.onload = function() {
     console.log('Window loaded');
     if (!window.app) {
         console.log('App not initialized via DOMContentLoaded, initializing now');
-        window.app = new App();
-        window.app.init().catch(err => {
-            console.error('Error during fallback app initialization:', err);
-        });
-    }
-};
