@@ -1,5 +1,5 @@
 services:
-  # Frontend Node.js
+  # Frontend Node.js - This is the main website that users should visit
   - type: web
     name: docgen-web
     env: node
@@ -16,7 +16,7 @@ services:
     healthCheckPath: /health
     autoDeploy: true
 
-  # Backend Python (FastAPI/Flask)
+  # Backend Python (Flask API) - This handles document processing only
   - type: web
     name: docgen-api
     env: python
@@ -30,5 +30,10 @@ services:
         value: ./server
       - key: DEBUG
         value: "false"
+      - key: FRONTEND_URL
+        fromService:
+          name: docgen-web
+          type: web
+          property: url
     healthCheckPath: /status
     autoDeploy: true

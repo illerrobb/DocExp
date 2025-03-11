@@ -15,12 +15,15 @@ const clientEnv = {
 app.use(cors());
 app.use(express.json());
 
-// Serve static files
-app.use(express.static(path.join(__dirname)));
+// Serve static files with proper caching
+app.use(express.static(path.join(__dirname), {
+  maxAge: '1h', // Cache static assets for 1 hour
+}));
 
 // Serve environment variables to client
 app.get('/env.js', (req, res) => {
   res.set('Content-Type', 'application/javascript');
+  res.set('Cache-Control', 'no-store'); // Don't cache environment variables
   res.send(`window.process = { env: ${JSON.stringify(clientEnv)} };`);
 });
 
@@ -75,6 +78,8 @@ app.get('/health', (req, res) => {
 // IMPORTANT: This needs to be AFTER all other routes
 // Serve index.html for all other routes to support SPA routing
 app.get('*', (req, res) => {
+  // Log the route being requested to help with debugging
+  console.log(`Serving index.html for route: ${req.path}`);
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 

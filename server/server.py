@@ -1,7 +1,7 @@
 import werkzeug
 print(f"Using Werkzeug version: {werkzeug.__version__}")
 
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, redirect
 from flask_cors import CORS
 import os
 import sys
@@ -25,6 +25,21 @@ def get_temp_dir():
     else:
         # Use system default temp directory
         return tempfile.gettempdir()
+
+@app.route('/', methods=['GET'])
+def home():
+    """Redirect to the frontend application"""
+    # Get frontend URL from environment variable
+    frontend_url = os.environ.get('FRONTEND_URL')
+    
+    # Default to a reasonable guess if env var not set
+    if not frontend_url:
+        if 'RENDER' in os.environ:
+            frontend_url = "https://docgen-web.onrender.com"
+        else:
+            frontend_url = "http://localhost:3000"
+            
+    return redirect(frontend_url)
 
 @app.route('/status', methods=['GET'])
 def status():
@@ -53,7 +68,7 @@ def generate_document():
         # Generate a temporary file path
         temp_dir = get_temp_dir()
         output_path = os.path.join(temp_dir, f"doc_{int(time.time())}.docx")
-            
+        
         # Generate the document
         success = create_word_document(template, form_data, output_path)
         
@@ -64,7 +79,6 @@ def generate_document():
                             mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
         else:
             return jsonify({'error': 'Failed to generate document'}), 500
-            
     except Exception as e:
         app.logger.error(f"Error generating document: {str(e)}")
         return jsonify({'error': str(e)}), 500
@@ -94,7 +108,6 @@ def generate_json_document():
             return jsonify({'success': True, 'path': output_path})
         else:
             return jsonify({'error': 'Failed to generate document'}), 500
-            
     except Exception as e:
         app.logger.error(f"Error generating JSON document: {str(e)}")
         return jsonify({'error': str(e)}), 500
@@ -142,7 +155,6 @@ def generate_pdf_preview():
             'success': True,
             'pdf': pdf_data.decode('latin1')  # This is not ideal but works for demo
         })
-            
     except Exception as e:
         app.logger.error(f"Error generating PDF preview: {str(e)}")
         return jsonify({'error': str(e)}), 500
