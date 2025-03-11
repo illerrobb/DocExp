@@ -14,7 +14,7 @@ services:
       - key: DEBUG
         value: "false"
       - key: FRONTEND_URL
-        value: https://docexp.onreader.com
+        value: https://docexp.onrender.com
       - key: API_URL
         value: https://docexp-api.onrender.com
     healthCheckPath: /status
@@ -32,10 +32,10 @@ services:
       - key: NODE_ENV
         value: production
       - key: FRONTEND_URL
-        value: https://docexp.onreader.com
+        value: https://docexp.onrender.com
       - key: PYTHON_SERVICE_URL
         value: https://docexp-api.onrender.com
     healthCheckPath: /health
     autoDeploy: true
     domains:
-      - docexp.onreader.com
+      - docexp.onrender.com
