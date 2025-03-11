@@ -1,3 +1,6 @@
+import werkzeug
+print(f"Using Werkzeug version: {werkzeug.__version__}")
+
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import os
