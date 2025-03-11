@@ -11,27 +11,19 @@ export class DocumentManager {
     
     // Get Python service URL based on environment
     getPythonServiceUrl() {
-        // Check if we're running on render.com or similar cloud environment
-        if (window.location.hostname.includes('render.com') || 
-            window.location.hostname.includes('onrender.com')) {
-            
-            // Check if we have an environment variable with the Python service URL
-            if (process.env && process.env.PYTHON_SERVICE_URL) {
-                return process.env.PYTHON_SERVICE_URL;
-            }
-            
-            // Default API path for render using the actual domain
-            const hostname = window.location.hostname;
-            if (hostname === 'docexp.onrender.com') {
-                return 'https://docexp-api.onrender.com';
-            }
-            
-            // Generic replacement (fallback)
-            return window.location.origin.replace('docexp', 'docexp-api');
-        } else {
-            // Use localhost for development
-            return 'http://localhost:5000';
+        // Use fixed URLs for production
+        if (window.location.hostname === 'docexp.onrender.com') {
+            // Explicitly set API URL in production
+            return 'https://docexp-api.onrender.com';
         }
+        
+        // For other environments, including development
+        if (window.process && window.process.env && window.process.env.PYTHON_SERVICE_URL) {
+            return window.process.env.PYTHON_SERVICE_URL;
+        }
+        
+        // Fallback for development
+        return 'http://localhost:5000';
     }
     
     async initializePythonService() {

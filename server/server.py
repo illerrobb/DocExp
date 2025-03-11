@@ -28,20 +28,13 @@ def get_temp_dir():
 
 @app.route('/', methods=['GET'])
 def home():
-    """Redirect to the frontend application"""
-    # Get frontend URL from environment variable
-    frontend_url = os.environ.get('FRONTEND_URL')
-    
-    # Default to the actual URL of your application on render.com
-    if not frontend_url:
-        if 'RENDER' in os.environ:
-            # Use the actual domain that's working for your app
-            frontend_url = "https://docexp.onrender.com"
-        else:
-            frontend_url = "http://localhost:3000"
-    
-    print(f"Redirecting to frontend: {frontend_url}")
-    return redirect(frontend_url)
+    """Return API info instead of redirecting to prevent loops"""
+    return jsonify({
+        "api": "DocGen API",
+        "status": "active",
+        "version": "1.0.0",
+        "message": "This is the API endpoint. For the web application, go to https://docexp.onrender.com"
+    })
 
 @app.route('/status', methods=['GET'])
 def status():

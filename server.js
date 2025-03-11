@@ -10,9 +10,7 @@ const clientEnv = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PYTHON_SERVICE_URL: process.env.PYTHON_SERVICE_URL || 'http://localhost:5000',
   APP_NAME: 'DocGen',
-  APP_VERSION: '1.0.0',
-  RENDER_DOMAIN: 'docexp.onrender.com',
-  API_RENDER_DOMAIN: 'docexp-api.onrender.com'
+  APP_VERSION: '1.0.0'
 };
 
 // Middleware
@@ -39,10 +37,18 @@ app.get('/health', (req, res) => {
     pythonServiceUrl: process.env.PYTHON_SERVICE_URL || 'not configured',
     hostname: req.hostname,
     url: req.url,
-    originalUrl: req.originalUrl,
-    baseUrl: req.baseUrl,
     serverTime: new Date().toISOString()
   });
+});
+
+// Fix - Add safety check to prevent redirect loops
+app.use((req, res, next) => {
+  // Check if this request might cause a redirect loop
+  const loopHeader = req.get('X-Docgen-Loop-Prevention');
+  if (loopHeader) {
+    return res.status(508).send('Loop detected. Request aborted to prevent infinite redirects.');
+  }
+  next();
 });
 
 // API routes
@@ -67,15 +73,6 @@ app.get('/api/pythonStatus', async (req, res) => {
   }
 });
 
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
-    environment: process.env.NODE_ENV,
-    pythonServiceUrl: process.env.PYTHON_SERVICE_URL || 'not configured' 
-  });
-});
-
-// IMPORTANT: This needs to be AFTER all other routes
 // Serve index.html for all other routes to support SPA routing
 app.get('*', (req, res) => {
   // Log the route being requested to help with debugging
