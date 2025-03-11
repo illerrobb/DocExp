@@ -56,3 +56,19 @@
 .pdf-preview-iframe {
     background-color: white;
 }
+
+/* Add styles for the file upload area */
+.file-upload-container {
+    margin-bottom: 20px;
+}
+
+.file-upload-container .file-info {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.file-upload-container .file-name {
+    font-weight: bold;
+    color: var(--primary-color);
+}

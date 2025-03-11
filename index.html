@@ -41,6 +41,11 @@
             <!-- Create Single Document View -->
             <section id="createDoc" class="view">
                 <h2>Crea Nuovo Documento</h2>
+                <div class="template-actions">
+                    <button id="uploadTemplateBtn" class="action-btn">
+                        <i class="fas fa-upload"></i> Carica Nuovo Template
+                    </button>
+                </div>
                 <div class="document-container">
                     <div class="template-selection">
                         <h3>Seleziona Template</h3>
@@ -110,8 +115,43 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal for uploading new template -->
+        <div id="uploadTemplateModal" class="modal">
+            <div class="modal-content">
+                <h3>Carica Nuovo Template</h3>
+                <form id="uploadTemplateForm">
+                    <div class="form-group">
+                        <label for="templateName">Nome Template:</label>
+                        <input type="text" id="templateName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="templateDescription">Descrizione:</label>
+                        <textarea id="templateDescription"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="templateFile">File Word Template (.docx):</label>
+                        <input type="file" id="templateFile" accept=".docx" required>
+                    </div>
+                    <div class="form-group">
+                        <h4>Definisci Campi</h4>
+                        <p class="helper-text">Definisci i campi che verranno compilati per questo template.</p>
+                        <div id="templateFields">
+                            <!-- Fields will be added here dynamically -->
+                        </div>
+                        <button type="button" id="addFieldBtn" class="secondary-btn">+ Aggiungi Campo</button>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="cancelTemplateUpload" class="secondary-btn">Annulla</button>
+                        <button type="submit" id="saveTemplate" class="primary-btn">Salva Template</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
+    <!-- Include font awesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <!-- JavaScript -->
     <script src="assets/js/diagnostics.js"></script>
     <script type="module" src="assets/js/app.js"></script>

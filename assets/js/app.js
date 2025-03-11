@@ -3,6 +3,7 @@ import { DocumentManager } from './document-manager.js';
 import { UIManager } from './ui-manager.js';
 import { PreviewManager } from './preview-manager.js';
 import { JsonTemplateManager } from './json-template-manager.js';
+import { TemplateManager } from './template-manager.js';
 
 class App {
     constructor() {
@@ -12,6 +13,7 @@ class App {
         this.uiManager = new UIManager();
         this.previewManager = new PreviewManager();
         this.jsonManager = new JsonTemplateManager();
+        this.templateManager = new TemplateManager(this.dbManager);
     }
     
     async init() {
@@ -23,6 +25,9 @@ class App {
             
             // Initialize JSON templates
             this.jsonManager.initDefaultTemplates();
+            
+            // Initialize template manager
+            this.templateManager.init();
             
             // Load initial data
             await this.loadDashboardData();

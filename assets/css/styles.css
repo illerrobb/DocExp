@@ -322,3 +322,87 @@ input, textarea, select {
     from { opacity: 0; }
     to { opacity: 1; }
 }
+
+.template-actions {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--accent-color);
+}
+
+.action-btn:hover {
+    background-color: #3d9290;
+}
+
+.helper-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.field-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border-radius: var(--border-radius);
+    align-items: center;
+}
+
+.field-row input, .field-row select {
+    margin-bottom: 0;
+}
+
+.field-row .field-type {
+    width: 150px;
+    flex-shrink: 0;
+}
+
+.field-row .field-required {
+    width: 80px;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.field-row .remove-field {
+    background-color: #dc3545;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+}
+
+.primary-btn {
+    background-color: var(--primary-color);
+}
+
+.drop-area {
+    border: 2px dashed #ccc;
+    border-radius: var(--border-radius);
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 15px;
+    transition: background-color 0.3s;
+}
+
+.drop-area:hover, .drop-area.drag-over {
+    background-color: #f0f0f0;
+    border-color: var(--accent-color);
+}
+
+.drop-area p {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #666;
+}

@@ -456,4 +456,28 @@ export class DatabaseManager {
             return null;
         }
     }
+
+    async saveTemplate(templateData) {
+        try {
+            const query = `
+                INSERT INTO templates (name, description, fields, createdAt)
+                VALUES (?, ?, ?, ?)
+            `;
+            
+            const stmt = this.db.prepare(query);
+            stmt.run([
+                templateData.name,
+                templateData.description,
+                JSON.stringify(templateData.fields),
+                templateData.createdAt
+            ]);
+            stmt.free();
+            
+            console.log('Template saved successfully:', templateData);
+            return true;
+        } catch (error) {
+            console.error('Failed to save template:', error);
+            return false;
+        }
+    }
 }
