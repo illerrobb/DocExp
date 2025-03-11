@@ -92,7 +92,14 @@ export class UIManager {
     
     renderTemplates(templates) {
         const container = document.getElementById('templateList');
+        if (!container) {
+            console.error('Template list container not found!');
+            return;
+        }
+        
         container.innerHTML = '';
+        
+        console.log(`Rendering ${templates.length} templates`);
         
         if (templates.length === 0) {
             container.innerHTML = '<p class="empty-message">Nessun template disponibile</p>';
@@ -103,6 +110,7 @@ export class UIManager {
             const card = document.createElement('div');
             card.className = 'card';
             card.dataset.id = template.id;
+            card.dataset.type = 'standard'; // Explicitly mark as standard template
             
             card.innerHTML = `
                 <h4>${template.name}</h4>
@@ -111,6 +119,7 @@ export class UIManager {
             `;
             
             container.appendChild(card);
+            console.log(`Added standard template card: ${template.name}, ID: ${template.id}`);
         });
     }
     
@@ -132,6 +141,11 @@ export class UIManager {
     }
     
     _createFormFieldsFromSchema(container, schema, prefix) {
+        if (!schema) {
+            console.error('Invalid schema provided:', schema);
+            return;
+        }
+
         if (schema.type === 'object' && schema.properties) {
             // Create a fieldset for this object
             const fieldset = document.createElement('fieldset');
@@ -153,6 +167,11 @@ export class UIManager {
             const arrayContainer = document.createElement('div');
             arrayContainer.className = 'array-container';
             arrayContainer.dataset.fieldName = prefix;
+            
+            // Store item schema for later use when adding new items
+            if (schema.item) {
+                arrayContainer.dataset.itemSchema = JSON.stringify(schema.item);
+            }
             
             const arrayHeader = document.createElement('div');
             arrayHeader.className = 'array-header';
