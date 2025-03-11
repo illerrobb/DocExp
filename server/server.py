@@ -28,13 +28,19 @@ def get_temp_dir():
 
 @app.route('/', methods=['GET'])
 def home():
-    """Return API info and direct users to the frontend app"""
+    """Redirect to the frontend application"""
+    frontend_url = os.environ.get('FRONTEND_URL', 'https://docexp.onrender.com')
+    return redirect(frontend_url, code=302)
+
+@app.route('/api-info', methods=['GET'])
+def api_info():
+    """Return API info for API documentation purposes"""
     return jsonify({
         "api": "DocGen API",
         "status": "active",
         "version": "1.0.0",
         "message": "This is the API endpoint. For the web application, go to https://docexp.onrender.com",
-        "frontend_url": "https://docexp.onrender.com"
+        "frontend_url": os.environ.get('FRONTEND_URL', 'https://docexp.onrender.com')
     })
 
 @app.route('/status', methods=['GET'])
@@ -222,6 +228,8 @@ def process_json_data(doc, data, level=0):
     if data is None:
         return
     
+    # Add proper indentation based on level
+    indent = "  " * level
     
     if isinstance(data, dict):
         for key, value in data.items():
