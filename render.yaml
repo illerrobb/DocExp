@@ -13,6 +13,8 @@ services:
           name: docgen-api
           type: web
           property: url
+    healthCheckPath: /health
+    autoDeploy: true
 
   # Backend Python (FastAPI/Flask)
   - type: web
@@ -28,3 +30,5 @@ services:
         value: ./server
       - key: DEBUG
         value: "false"
+    healthCheckPath: /status
+    autoDeploy: true

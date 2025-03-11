@@ -14,6 +14,8 @@ const clientEnv = {
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve static files
 app.use(express.static(path.join(__dirname)));
 
 // Serve environment variables to client
@@ -22,12 +24,7 @@ app.get('/env.js', (req, res) => {
   res.send(`window.process = { env: ${JSON.stringify(clientEnv)} };`);
 });
 
-// Serve the main application
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// API route to start Python server if needed
+// API routes
 app.get('/api/startPythonServer', (req, res) => {
   try {
     exec('cd server && python server.py', (error, stdout, stderr) => {
@@ -43,7 +40,6 @@ app.get('/api/startPythonServer', (req, res) => {
   }
 });
 
-// API route to check Python server status
 app.get('/api/pythonStatus', async (req, res) => {
   try {
     const pythonUrl = process.env.PYTHON_SERVICE_URL || 'http://localhost:5000';
@@ -68,7 +64,6 @@ app.get('/api/pythonStatus', async (req, res) => {
   }
 });
 
-// Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
@@ -77,14 +72,10 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Catch all routes for SPA
+// IMPORTANT: This needs to be AFTER all other routes
+// Serve index.html for all other routes to support SPA routing
 app.get('*', (req, res) => {
-  // Exclude API routes and static files
-  if (!req.path.startsWith('/api/') && !req.path.includes('.')) {
-    res.sendFile(path.join(__dirname, 'index.html'));
-  } else {
-    res.status(404).json({ error: 'Not found' });
-  }
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Start the server
