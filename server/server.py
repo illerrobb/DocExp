@@ -28,9 +28,12 @@ def get_temp_dir():
 
 @app.route('/', methods=['GET'])
 def home():
-    """Redirect to the frontend application"""
-    frontend_url = os.environ.get('FRONTEND_URL', 'https://docexp.onrender.com')
-    return redirect(frontend_url, code=302)
+    """Return a basic API welcome message so that clients accessing the API host get a simple response."""
+    return jsonify({
+        'message': "Welcome to the DocGen API",
+        'status': 'active',
+        'version': '1.0.0'
+    })
 
 @app.route('/api-info', methods=['GET'])
 def api_info():

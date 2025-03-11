@@ -24,7 +24,14 @@ app.use((req, res, next) => {
 });
 
 // Serve static files with proper caching
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname), {
+  maxAge: '1h',
+  setHeaders: (res, path) => {
+    if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  }
+}));
 
 // Serve environment variables to client
 app.get('/env.js', (req, res) => {
@@ -70,9 +77,15 @@ app.get('/api/pythonStatus', async (req, res) => {
 });
 
 // Serve index.html for all other routes to support SPA routing
-app.get('*', (req, res) => {
-  // Log the route being requested to help with debugging
-  console.log(`Serving index.html for route: ${req.path}`);
+app.get('*', (req, res, next) => {
+  // Skip API routes
+  if (req.path.startsWith('/api/')) {
+    return next();
+  }
+  // Set no-cache headers for index.html
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 

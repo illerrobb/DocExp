@@ -8,6 +8,8 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: FRONTEND_URL
+        value: https://docexp.onrender.com
       - key: PYTHON_SERVICE_URL
         value: https://docexp-api.onrender.com
     healthCheckPath: /health
@@ -29,5 +31,7 @@ services:
         value: "false"
       - key: FRONTEND_URL
         value: https://docexp.onrender.com
+      - key: API_URL
+        value: https://docexp-api.onrender.com
     healthCheckPath: /status
     autoDeploy: true
