@@ -16,12 +16,18 @@ export class DocumentManager {
             window.location.hostname.includes('onrender.com')) {
             
             // Check if we have an environment variable with the Python service URL
-            if (process.env.PYTHON_SERVICE_URL) {
+            if (process.env && process.env.PYTHON_SERVICE_URL) {
                 return process.env.PYTHON_SERVICE_URL;
             }
             
-            // Default API path for render
-            return window.location.origin.replace('docgen-web', 'docgen-api');
+            // Default API path for render using the actual domain
+            const hostname = window.location.hostname;
+            if (hostname === 'docexp.onrender.com') {
+                return 'https://docexp-api.onrender.com';
+            }
+            
+            // Generic replacement (fallback)
+            return window.location.origin.replace('docexp', 'docexp-api');
         } else {
             // Use localhost for development
             return 'http://localhost:5000';

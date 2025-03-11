@@ -1,7 +1,7 @@
 services:
   # Frontend Node.js - This is the main website that users should visit
   - type: web
-    name: docgen-web
+    name: docexp
     env: node
     buildCommand: npm install
     startCommand: node server.js
@@ -10,7 +10,7 @@ services:
         value: production
       - key: PYTHON_SERVICE_URL
         fromService:
-          name: docgen-api
+          name: docexp-api
           type: web
           property: url
     healthCheckPath: /health
@@ -18,7 +18,7 @@ services:
 
   # Backend Python (Flask API) - This handles document processing only
   - type: web
-    name: docgen-api
+    name: docexp-api
     env: python
     runtime: python3.9
     buildCommand: pip install -r server/requirements.txt
@@ -31,9 +31,6 @@ services:
       - key: DEBUG
         value: "false"
       - key: FRONTEND_URL
-        fromService:
-          name: docgen-web
-          type: web
-          property: url
+        value: https://docexp.onrender.com
     healthCheckPath: /status
     autoDeploy: true

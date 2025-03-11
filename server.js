@@ -8,7 +8,11 @@ const PORT = process.env.PORT || 3000;
 // Environment variables for client-side
 const clientEnv = {
   NODE_ENV: process.env.NODE_ENV || 'development',
-  PYTHON_SERVICE_URL: process.env.PYTHON_SERVICE_URL || 'http://localhost:5000'
+  PYTHON_SERVICE_URL: process.env.PYTHON_SERVICE_URL || 'http://localhost:5000',
+  APP_NAME: 'DocGen',
+  APP_VERSION: '1.0.0',
+  RENDER_DOMAIN: 'docexp.onrender.com',
+  API_RENDER_DOMAIN: 'docexp-api.onrender.com'
 };
 
 // Middleware
@@ -25,6 +29,20 @@ app.get('/env.js', (req, res) => {
   res.set('Content-Type', 'application/javascript');
   res.set('Cache-Control', 'no-store'); // Don't cache environment variables
   res.send(`window.process = { env: ${JSON.stringify(clientEnv)} };`);
+});
+
+// Health check with detailed info
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    environment: process.env.NODE_ENV,
+    pythonServiceUrl: process.env.PYTHON_SERVICE_URL || 'not configured',
+    hostname: req.hostname,
+    url: req.url,
+    originalUrl: req.originalUrl,
+    baseUrl: req.baseUrl,
+    serverTime: new Date().toISOString()
+  });
 });
 
 // API routes
@@ -45,24 +63,6 @@ app.get('/api/startPythonServer', (req, res) => {
 
 app.get('/api/pythonStatus', async (req, res) => {
   try {
-    const pythonUrl = process.env.PYTHON_SERVICE_URL || 'http://localhost:5000';
-    
-    try {
-      const response = await fetch(`${pythonUrl}/status`);
-      if (response.ok) {
-        const data = await response.json();
-        return res.json({ available: true, status: data });
-      } else {
-        return res.json({ available: false, error: `Status code: ${response.status}` });
-      }
-    } catch (error) {
-      return res.json({ 
-        available: false, 
-        error: error.message,
-        hint: 'Python service may not be running'
-      });
-    }
-  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });

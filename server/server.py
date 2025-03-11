@@ -32,13 +32,15 @@ def home():
     # Get frontend URL from environment variable
     frontend_url = os.environ.get('FRONTEND_URL')
     
-    # Default to a reasonable guess if env var not set
+    # Default to the actual URL of your application on render.com
     if not frontend_url:
         if 'RENDER' in os.environ:
-            frontend_url = "https://docgen-web.onrender.com"
+            # Use the actual domain that's working for your app
+            frontend_url = "https://docexp.onrender.com"
         else:
             frontend_url = "http://localhost:3000"
-            
+    
+    print(f"Redirecting to frontend: {frontend_url}")
     return redirect(frontend_url)
 
 @app.route('/status', methods=['GET'])
@@ -226,8 +228,6 @@ def process_json_data(doc, data, level=0):
     if data is None:
         return
     
-    # Calculate indentation for hierarchical display
-    indent = "\t" * level
     
     if isinstance(data, dict):
         for key, value in data.items():
